@@ -1,0 +1,4 @@
+- [x] Basic Boilerplate with Task Model.
+- [ ] Manage File Structure [MVC].
+- [ ] CRUD opeations on Task Model.
+- [ ] Add Authentication.
