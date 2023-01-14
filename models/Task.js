@@ -15,6 +15,10 @@ const TaskSchema = new mongoose.Schema({
     status: {
         type: Boolean,
         default: false
+    },
+    creator: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
     }
 });
 

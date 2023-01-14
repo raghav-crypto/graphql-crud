@@ -1,4 +1,7 @@
 - [x] Basic Boilerplate with Task Model.
+- [x] Create User. Relationship between Tasks and User.
+- [x] Dynamic Relations and Infinity nested queries.
+- [ ] Creating Users.
+- [ ] Validating body Data.
 - [ ] Manage File Structure [MVC].
 - [ ] CRUD opeations on Task Model.
-- [ ] Add Authentication.
