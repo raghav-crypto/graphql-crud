@@ -8,9 +8,11 @@ const isAuth = require('./middleware/auth');
 const User = require('./models/User');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
+const cors = require('cors');
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 connectDB();
 
