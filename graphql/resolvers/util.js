@@ -27,9 +27,15 @@ const transformTasks = task => {
         creator: getUser.bind(this, task._doc.creator)
     }
 }
+const protectRoute = (isAuth) => {
+    if (!isAuth) {
+        throw new Error("Not Authenticated.");
+    }
+}
 
 module.exports = {
     getUser,
     getTasks,
-    transformTasks
+    transformTasks,
+    protectRoute
 }

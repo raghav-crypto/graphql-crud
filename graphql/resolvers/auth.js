@@ -1,13 +1,12 @@
 const User = require('../../models/User');
 const jwt = require('jsonwebtoken');
-const { getTasks } = require('./mergeUtil');
+const { getTasks } = require('./util');
+const { protectRoute } = require('./util');
 
 module.exports = {
     me: async (args, req) => {
         try {
-            if (!req.isAuth) {
-                throw new Error("Not Authenticated.");
-            }
+            protectRoute(req.isAuth);
             const user = await User.findById(req.user.id);
             if (!user) {
                 throw new Error("Not Authenticated.")
@@ -49,5 +48,9 @@ module.exports = {
             expiresIn: '1h'
         })
         return { userId: user.id, token, tokenExpiration: 1 };
+    },
+    deleteUser: async (args) => {
+        protectRoute(req.isAuth);
+
     }
 }

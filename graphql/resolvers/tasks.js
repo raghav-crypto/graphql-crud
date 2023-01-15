@@ -1,6 +1,6 @@
 const Task = require('../../models/Task');
 const User = require('../../models/User');
-const { transformTasks, getUser } = require('./mergeUtil');
+const { transformTasks, getUser, protectRoute } = require('./util');
 
 module.exports = {
     tasks: async () => {
@@ -11,15 +11,13 @@ module.exports = {
 
             })
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
             throw error;
         }
     },
     createTask: async (args, req) => {
         try {
-            if (!req.isAuth) {
-                throw new Error("Not Authenticated.");
-            }
+            protectRoute(req.isAuth);
             let task = await Task.create({
                 title: args.taskInput.title,
                 description: args.taskInput.description,
@@ -35,7 +33,7 @@ module.exports = {
             await user.save();
             return task;
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
             throw error;
         }
     },
@@ -54,9 +52,7 @@ module.exports = {
     updateTask: async (args, req) => {
         const { title, taskId, description, status } = args.updateTaskInput;
         try {
-            if (!req.isAuth) {
-                throw new Error("Not Authorized.");
-            }
+            protectRoute(req.isAuth);
             try {
                 let task = await Task.findById(taskId);
                 if (!task) {
@@ -79,9 +75,7 @@ module.exports = {
     deleteTask: async (args, req) => {
         const { taskId } = args;
         try {
-            if (!req.isAuth) {
-                throw new Error("Not Authorized.");
-            }
+            protectRoute(req.isAuth);
             try {
                 let task = await Task.findById(taskId);
                 if (!task) {

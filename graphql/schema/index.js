@@ -49,6 +49,7 @@ module.exports = buildSchema(`
         type RootQuery {
             tasks: [Task!]!
             me: User!
+            deleteUser: DeleteTask!
         }
         type RootMutation {
             createTask(taskInput: TaskInput): Task
