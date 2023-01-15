@@ -6,5 +6,5 @@
 - [x] Login Route + Authentication Middleware.
 - [x] CRUD opeations on Task and User Model.
 - [x] Forgot Password.
-- [ ] Verify Email.
+- [x] Verify Email.
 - [ ] Validating body Data.
