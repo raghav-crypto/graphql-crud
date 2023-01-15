@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const { getTasks } = require('./util');
 const { protectRoute } = require('./util');
 const Task = require('../../models/Task');
-const { unusedFragMessage } = require('graphql/validation/rules/NoUnusedFragments');
+const sendEmail = require('../../helpers/sendEmail');
 
 module.exports = {
     me: async (args, req) => {
@@ -21,11 +21,12 @@ module.exports = {
     },
     createUser: async (args) => {
         try {
-            const { name, password } = args.userInput;
+            const { name, password, email } = args.userInput;
 
             const user = await User.create({
                 name,
                 password,
+                email
             })
             await user.save();
             return user;
@@ -76,6 +77,36 @@ module.exports = {
         } catch (error) {
             console.log(error)
             throw error;
+        }
+    },
+    forgotPassword: async (args, req) => {
+        const user = await User.findOne({ email: args.email });
+        if (!user) {
+            throw new Error("User Not found.");
+        }
+        const resetToken = user.getResetPasswordToken();
+
+        await user.save({ validateBeforeSave: false });
+        const resetUrl = `${req.protocol}://${req.get(
+            'host',
+        )}/resetpassword/${resetToken}`;
+        const message = `You are receiving this email because you (or someone else) has requested the reset of a password. Please make a PUT request to: \n\n ${resetUrl}`;
+
+        try {
+            await sendEmail({
+                email: user.email,
+                subject: 'Password reset token',
+                message,
+            });
+
+            return { success: true };
+        } catch (err) {
+            console.log(err);
+            user.resetPasswordToken = undefined;
+            user.resetPasswordExpire = undefined;
+
+            await user.save({ validateBeforeSave: false });
+            throw new Error("Email could not be sent");
         }
     }
 }

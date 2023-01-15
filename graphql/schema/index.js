@@ -45,6 +45,7 @@ module.exports = buildSchema(`
         input UserInput {
             name: String!
             password: String!
+            email: String!
         }
         type RootQuery {
             tasks: [Task!]!
@@ -59,6 +60,7 @@ module.exports = buildSchema(`
             updateTask(updateTaskInput: UpdateTaskInput): Task
             deleteTask(taskId: String!): DeleteTask
             updateUser(username: String): User
+            forgotPassword(email: String!): DeleteTask
         }
         schema {
             query: RootQuery
