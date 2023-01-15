@@ -21,7 +21,7 @@ app.use('/graphql', graphqlHTTP({
     rootValue: graphqlResolvers,
     graphiql: true
 }))
-app.put('/resetpassword/:resetToken', async (req, res, enxt) => {
+app.put('/resetpassword/:resetToken', async (req, res, next) => {
     const resetPasswordToken = crypto
         .createHash('sha256')
         .update(req.params.resetToken)
@@ -45,6 +45,40 @@ app.put('/resetpassword/:resetToken', async (req, res, enxt) => {
         { expiresIn: '1h' });
     await user.save();
     return res.json({ success: true, message: "Password Successfully Reset.", data: { token } })
+})
+app.get('/confirmEmail', async (req, res, next) => {
+    try {
+        const { token } = req.query;
+
+        if (!token) {
+            return res.json({ message: "Invalid Token", success: false })
+        }
+        const splitToken = token.split('.')[0];
+        const confirmEmailToken = crypto
+            .createHash('sha256')
+            .update(splitToken)
+            .digest('hex');
+
+        // get user by token
+        const user = await User.findOne({
+            confirmEmailToken,
+            isEmailVerified: false,
+        });
+        if (!user) {
+            return res.json({ message: "Invalid Token", success: false })
+        }
+
+        // update confirmed to true
+        user.confirmEmailToken = undefined;
+        user.isEmailVerified = true;
+
+        user.save({ validateBeforeSave: false });
+        return res.json({ success: true })
+    }
+    catch (error) {
+        console.log(error);
+
+    }
 })
 app.listen(3000, () => {
     console.log(`Server is up and running on port ${process.env.PORT || "3000"}`);

@@ -19,7 +19,7 @@ module.exports = {
             throw error;
         }
     },
-    createUser: async (args) => {
+    createUser: async (args, req) => {
         try {
             const { name, password, email } = args.userInput;
 
@@ -28,6 +28,20 @@ module.exports = {
                 password,
                 email
             })
+            const confirmEmailToken = user.generateEmailConfirmToken();
+
+            const confirmEmailURL = `${req.protocol}://${req.get(
+                'host',
+            )}/confirmEmail?token=${confirmEmailToken}`;
+            ;
+
+            const message = `You are receiving this email because you need to confirm your email address.Please make a GET request to: \n\n ${confirmEmailURL} `;
+
+            sendEmail({
+                email: user.email,
+                subject: 'Email confirmation token',
+                message,
+            });
             await user.save();
             return user;
         } catch (err) {
@@ -80,33 +94,40 @@ module.exports = {
         }
     },
     forgotPassword: async (args, req) => {
-        const user = await User.findOne({ email: args.email });
-        if (!user) {
-            throw new Error("User Not found.");
-        }
-        const resetToken = user.getResetPasswordToken();
-
-        await user.save({ validateBeforeSave: false });
-        const resetUrl = `${req.protocol}://${req.get(
-            'host',
-        )}/resetpassword/${resetToken}`;
-        const message = `You are receiving this email because you (or someone else) has requested the reset of a password. Please make a PUT request to: \n\n ${resetUrl}`;
-
         try {
-            await sendEmail({
-                email: user.email,
-                subject: 'Password reset token',
-                message,
-            });
-
-            return { success: true };
-        } catch (err) {
-            console.log(err);
-            user.resetPasswordToken = undefined;
-            user.resetPasswordExpire = undefined;
+            const user = await User.findOne({ email: args.email });
+            if (!user) {
+                throw new Error("User Not found.");
+            }
+            const resetToken = user.getResetPasswordToken();
 
             await user.save({ validateBeforeSave: false });
-            throw new Error("Email could not be sent");
+            const resetUrl = `${req.protocol}://${req.get(
+                'host',
+            )
+                }/resetpassword/${resetToken} `;
+            const message = `You are receiving this email because you(or someone else) has requested the reset of a password.Please make a PUT request to: \n\n ${resetUrl} `;
+
+            try {
+                await sendEmail({
+                    email: user.email,
+                    subject: 'Password reset token',
+                    message,
+                });
+
+                return { success: true };
+            } catch (err) {
+                console.log(err);
+                user.resetPasswordToken = undefined;
+                user.resetPasswordExpire = undefined;
+
+                await user.save({ validateBeforeSave: false });
+                throw new Error("Email could not be sent");
+            }
+        }
+        catch (error) {
+            console.log(error)
+            throw error
         }
     }
 }
