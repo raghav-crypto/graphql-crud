@@ -9,12 +9,13 @@ const User = require('./models/User');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
-
 const app = express();
-app.use(express.json());
-app.use(cors());
+const APP_START_TIME = Date.now();
 
 connectDB();
+
+app.use(cors());
+app.use(express.json());
 
 app.use(isAuth);
 
@@ -23,6 +24,15 @@ app.use('/graphql', graphqlHTTP({
     rootValue: graphqlResolvers,
     graphiql: true
 }))
+app.get(
+    "/",
+    (req, res) => {
+        return res.json({
+            msg: "success",
+            uptime: Date.now() - APP_START_TIME,
+            apiDocs: 'https://documenter.getpostman.com/view/11141903/2s8ZDSdQyR'
+        })
+    });
 app.put('/resetpassword/:resetToken', async (req, res, next) => {
     const resetPasswordToken = crypto
         .createHash('sha256')
