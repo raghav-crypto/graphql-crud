@@ -1,6 +1,10 @@
 const { buildSchema } = require('graphql');
 
 module.exports = buildSchema(`
+        type Error {
+            path: String!
+            message: String!
+        }
         type User{
             _id: ID!
             name: String!
@@ -15,6 +19,10 @@ module.exports = buildSchema(`
             createdAt: String!
             creator: User!
         }
+        type DeleteTask {
+            success: Boolean!
+            error: [Error!]
+        }
         type AuthData {
             userId: ID!
             token: String!
@@ -23,6 +31,12 @@ module.exports = buildSchema(`
         input TaskInput {
             title: String!
             description: String
+        }
+        input UpdateTaskInput {
+            taskId: String!
+            title: String
+            description: String
+            status: Boolean
         }
         input AuthInput { 
             name: String!
@@ -40,6 +54,9 @@ module.exports = buildSchema(`
             createTask(taskInput: TaskInput): Task
             createUser(userInput: UserInput): User
             login(authInput: AuthInput): AuthData
+            task(taskId: String!): Task!
+            updateTask(updateTaskInput: UpdateTaskInput): Task
+            deleteTask(taskId: String!): DeleteTask
         }
         schema {
             query: RootQuery
