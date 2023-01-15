@@ -15,16 +15,19 @@ module.exports = {
             throw error;
         }
     },
-    createTask: async (args) => {
+    createTask: async (args, req) => {
         try {
+            if (!req.isAuth) {
+                throw new Error("Not Authenticated.");
+            }
             let task = await Task.create({
                 title: args.taskInput.title,
                 description: args.taskInput.description,
-                creator: "63c284c0dac1760ecc19d061"
+                creator: req.user.id
             })
             await task.save();
             task = transformTasks(task);
-            const user = await User.findById("63c284c0dac1760ecc19d061");
+            const user = await User.findById(req.user.id);
             if (!user) {
                 throw new Error("User not found.");
             }

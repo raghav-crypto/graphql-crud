@@ -2,6 +2,7 @@
 - [x] Create User. Relationship between Tasks and User.
 - [x] Dynamic Relations and Infinity nested queries.
 - [x] Manage File Structure adding Helper Functions.
-- [ ] Creating Users.
-- [ ] Validating body Data.
+- [x] Creating Users.
+- [x] Login Route + Authentication Middleware.
 - [ ] CRUD opeations on Task Model.
+- [ ] Validating body Data.
