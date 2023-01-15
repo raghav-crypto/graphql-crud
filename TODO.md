@@ -4,5 +4,5 @@
 - [x] Manage File Structure adding Helper Functions.
 - [x] Creating Users.
 - [x] Login Route + Authentication Middleware.
-- [ ] CRUD opeations on Task Model.
+- [x] CRUD opeations on Task and User Model.
 - [ ] Validating body Data.

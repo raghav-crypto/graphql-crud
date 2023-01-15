@@ -58,6 +58,7 @@ module.exports = buildSchema(`
             task(taskId: String!): Task!
             updateTask(updateTaskInput: UpdateTaskInput): Task
             deleteTask(taskId: String!): DeleteTask
+            updateUser(username: String): User
         }
         schema {
             query: RootQuery

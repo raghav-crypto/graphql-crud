@@ -2,6 +2,8 @@ const User = require('../../models/User');
 const jwt = require('jsonwebtoken');
 const { getTasks } = require('./util');
 const { protectRoute } = require('./util');
+const Task = require('../../models/Task');
+const { unusedFragMessage } = require('graphql/validation/rules/NoUnusedFragments');
 
 module.exports = {
     me: async (args, req) => {
@@ -49,8 +51,31 @@ module.exports = {
         })
         return { userId: user.id, token, tokenExpiration: 1 };
     },
-    deleteUser: async (args) => {
+    deleteUser: async (args, req) => {
         protectRoute(req.isAuth);
+        try {
+            const user = await User.findById(req.user.id);
+            if (!user) {
+                throw new Error("Not Authorized!");
+            }
 
+            await Task.deleteMany({ _id: { $in: user.tasks } });
+            await user.remove();
+            return { success: true };
+        } catch (error) {
+            console.log(error);
+            throw error;
+        }
+
+    },
+    updateUser: async (args, req) => {
+        protectRoute(req.isAuth);
+        try {
+            const user = await User.findOneAndUpdate({ _id: req.user.id }, { name: args.username }, { new: true });
+            return user;
+        } catch (error) {
+            console.log(error)
+            throw error;
+        }
     }
 }
